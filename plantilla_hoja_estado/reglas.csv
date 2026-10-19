@@ -1,0 +1,6 @@
+nombre,campo,patron,campo2,patron2,activa,nota
+Promociones,etiqueta,CATEGORY_PROMOTIONS,,,sí,Pestaña Promociones de Gmail
+Remitentes automáticos,remitente,no-?reply,,,sí,
+Boletines,remitente,substack\.com|newsletter,,,sí,Ejemplo
+Avisos de una herramienta,remitente,@herramienta-ejemplo\.com,asunto,^resumen semanal,sí,Ejemplo con dos condiciones
+Bot de despliegues,slack,despliegues \(bot\),,,no,Ejemplo de regla de Slack desactivada

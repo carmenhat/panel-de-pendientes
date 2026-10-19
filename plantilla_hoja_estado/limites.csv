@@ -1,0 +1,12 @@
+limite,valor,nota
+dias,3,Días hacia atrás (1–14)
+correos_bandeja,40,Hilos de la bandeja (1–50)
+enviados,50,Enviados que se cruzan (1–50)
+slack_por_pagina,20,Resultados por página en Slack (1–20)
+slack_paginas,2,Páginas de Slack (1–5)
+minutos_validez,5,Minutos que valen los datos (1–5)
+reuniones,100,Eventos de calendario que se leen (1–250)
+hilos_completar,10,Hilos largos que se abren enteros (0–25)
+conversaciones_leer,15,Conversaciones de Slack que se leen enteras (0–30)
+ia_lote,20,Mensajes por tanda de IA (1–30)
+ia_lotes,3,Tandas de IA por carga (0–5; 0 apaga la IA)

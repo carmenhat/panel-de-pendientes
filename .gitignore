@@ -1,0 +1,7 @@
+# Datos reales para generar la copia pública: nunca se suben
+datos_privados.json
+herramientas/datos_privados.json
+
+.env
+desktop.ini
+__pycache__/

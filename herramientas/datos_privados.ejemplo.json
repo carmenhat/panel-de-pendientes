@@ -1,0 +1,17 @@
+{
+  "sustituciones": [
+    {
+      "original": "const ME_EMAIL = \"nombre.real@empresa-real.com\";",
+      "nuevo": "const ME_EMAIL = \"tu.nombre@tuempresa.com\"; // ← tu correo",
+      "veces": 1
+    },
+    {
+      "original": "Clasificas la bandeja de entrada de Nombre Real, de Empresa Real.",
+      "nuevo": "Clasificas la bandeja de entrada de una persona del departamento de IT.",
+      "veces": 1
+    }
+  ],
+  "prohibido": ["nombre real", "empresa-real", "empresa real"],
+  "correos_permitidos": ["tu.nombre@tuempresa.com", "workspace-noreply@google.com"],
+  "ids_permitidos": ["slack_search_public_and_private"]
+}
