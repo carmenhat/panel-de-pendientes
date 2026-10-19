@@ -74,6 +74,16 @@ python herramientas/copia_publica.py <panel real>/index.html index.html <ruta>/d
 
 El script se para sin escribir nada si una sustitución no aparece las veces previstas (el panel ha cambiado) o si en la salida queda cualquier dato prohibido, un correo, un id de Slack o algo con forma de id de Drive.
 
+### Cómo lo hago yo
+
+El panel real vive en un repo privado del trabajo y `datos_privados.json` en mi copia local de este repo, en mi ordenador personal. No tengo los dos en la misma máquina, así que regenero desde una sesión de Claude en la nube con mi ordenador enlazado:
+
+1. La sesión clona el repo privado del panel y este.
+2. Pide acceso a mi copia local de este repo y lee de ahí `datos_privados.json`, sin copiarlo a ningún repo.
+3. Ejecuta el script. Si para, ajusta la sustitución que nombra en `datos_privados.json` (y me devuelve el archivo actualizado) antes de volver a lanzarlo.
+4. Revisa la salida: que el JavaScript sigue siendo válido y que el cambio es el que esperaba.
+5. Actualiza en este README lo que haya cambiado (estado, pendiente, fecha) y lo sube.
+
 ---
 
 Última actualización: 19/10/2026
