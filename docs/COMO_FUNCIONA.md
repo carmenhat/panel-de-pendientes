@@ -22,7 +22,8 @@ flowchart TD
 2. **Gmail**: bandeja y enviados de los últimos 3 días, cruzados por hilo. Los hilos que llegan incompletos se abren enteros (hasta 10).
 3. **Slack**: mensajes directos (se lee cada conversación, hasta 15) y menciones (se agrupan por hilo y se lee cada hilo, hasta 15). Además, mis directos enviados y los perfiles, para unir a cada persona con su correo.
 4. **Calendar**: eventos de hoy, solo reuniones con otras personas.
-5. Aplica reglas, correcciones, IA y resueltos (abajo), y pinta los contadores, la bandeja con filtros, la agenda, los accesos rápidos y las notas.
+5. Aplica reglas, correcciones, IA, resueltos y leídos (abajo), y pinta los contadores, la bandeja con filtros, la agenda, los accesos rápidos y las notas.
+6. Si está configurado, lee el resumen del panel de salud y pinta su botón en la cabecera.
 
 Cada bloque se pinta cuando llega su fuente. Si una falla, sale su aviso y su botón de reintentar, y el resto sigue. Cuando un límite corta, el panel dice cuánto ha leído y si puede haber más. Los datos valen 5 minutos: «Actualizar» los vuelve a pedir y, al volver a la pestaña, se releen si han caducado.
 
@@ -35,13 +36,22 @@ Cada bloque se pinta cuando llega su fuente. Si una falla, sale su aviso y su bo
 
 ## El estado de cada elemento, en este orden
 
-1. **Regla** de la hoja, salvo que la coja una excepción: pasa a Informativos, agrupado por el nombre de la regla.
-2. **Corrección a mano** («Informativo» o «Necesita respuesta»): manda hasta que llega un mensaje posterior, y bloquea a la IA.
+1. **Regla** de la hoja, salvo que la coja una excepción: pasa a Informativos, agrupado por el nombre de la regla, o a «Para leer» si la regla tiene `destino` = `leer`.
+2. **Corrección a mano** («Informativo», «Para leer» o «Necesita respuesta»): manda hasta que llega un mensaje posterior, y bloquea a la IA.
 3. **IA**: solo si no hay corrección. Solo cambia algo cuando dice «informativo»; entonces el elemento pasa al grupo «Apartados por la IA» con su motivo.
 4. **Cruce entre canales**, como arriba.
 5. **Resuelto a mano**, con motivo: sale de pendientes hasta que llega un mensaje posterior. Sirve para lo que se cerró por teléfono o en persona.
+6. **Leído**: lo de «Para leer» pasa a Informativos, grupo «Leídos», hasta que llega un mensaje posterior. «No leído» lo devuelve antes.
 
-Lo informativo nunca desaparece sin rastro: se aparta, se cuenta y se puede ver. Lo automático a veces pide acción.
+Lo informativo nunca desaparece sin rastro: se aparta, se cuenta y se puede ver. Lo automático a veces pide acción. Los grupos de Informativos se pliegan; arrancan plegados salvo «Marcados a mano» y «Apartados por la IA».
+
+## «Para leer»
+
+Son avisos que no piden respuesta pero que hay que leer. Tienen su contador y su filtro, y no cuentan en «Pendiente» ni en «Esperan respuesta». Entran por una regla con `destino` = `leer` o a mano, con el botón «Para leer»: solo ese mensaje, o todos los de ese remitente, que crea la regla. La IA no los ve ni propone esta categoría.
+
+## El botón de salud
+
+Lee la pestaña `Resumen` de la hoja de un panel de salud de automatizaciones (columnas proyecto, estado, detalle, timestamp) y no recalcula nada. Rojo si algún estado no es OK; ámbar si el detalle lleva «⚠» o el último latido tiene más de 26 horas; verde si todo va bien; gris si no se puede leer. Al pulsarlo, abre el panel de salud.
 
 ## La IA
 
@@ -83,3 +93,5 @@ Lo informativo nunca desaparece sin rastro: se aparta, se cuenta y se puede ver.
 | Webhook de Apps Script para escribir | No hace falta: el artifact escribe en Drive y en hojas con los conectores |
 | Chips de Google en los accesos rápidos | La lectura de la hoja solo devuelve el texto visible: el enlace va como texto |
 | Clasificar con IA todo en cada carga | Se paga cada vez: solo lo nuevo, y el resultado se guarda |
+| Meter «Para leer» dentro de Pendiente | Lo que pide respuesta y lo que pide lectura no se atienden igual. Lo leído va a Informativos, no a Resueltos |
+| Recordar en el navegador qué grupos están plegados | Igual en cualquier equipo |

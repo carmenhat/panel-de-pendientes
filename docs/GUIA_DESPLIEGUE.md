@@ -17,7 +17,7 @@ La clasificación con IA gasta uso de tu cuenta de Claude. Si no la quieres, pon
 3. Importa en cada pestaña su CSV. Las de `reglas`, `excepciones`, `botones` y `limites` traen ejemplos: cámbialos por los tuyos. Las otras tres solo llevan la cabecera; las rellena el panel.
 4. En `botones`, el enlace va como texto (`https://…`), no como chip de Google: la lectura de la hoja solo devuelve el texto visible.
 
-Las reglas usan expresiones regulares sin distinguir mayúsculas. El campo puede ser `remitente`, `asunto`, `etiqueta` (de Gmail) o `slack` (el nombre de quien escribe, con « (bot)» detrás si es una aplicación). Con `campo2` y `patron2` se tienen que cumplir las dos condiciones. Una regla solo cuenta si en `activa` pone `sí`.
+Las reglas usan expresiones regulares sin distinguir mayúsculas. El campo puede ser `remitente`, `asunto`, `etiqueta` (de Gmail) o `slack` (el nombre de quien escribe, con « (bot)» detrás si es una aplicación). Con `campo2` y `patron2` se tienen que cumplir las dos condiciones. Una regla solo cuenta si en `activa` pone `sí`. Con `destino` vacío, lo que coge va a Informativos; con `leer`, a «Para leer».
 
 ## 2. Las notas
 
@@ -36,6 +36,8 @@ Abre [`index.html`](../index.html) y rellena las líneas marcadas con `←`:
 | `NOTES_FOLDER` | El id de la carpeta de notas |
 | `NOTES_OLD_FOLDER` | El id de la subcarpeta `_anteriores` |
 | `NOTES_SHEET` | El id de la hoja índice de notas |
+| `HEALTH_SHEET` | Opcional. El id de la hoja de tu panel de salud, con una pestaña `Resumen` (proyecto, estado, detalle, timestamp en `dd/mm/aaaa hh:mm`). Si no tienes, el botón sale en gris |
+| Enlace del botón de salud | En el HTML, `href="https://claude.ai/artifact/TU_PANEL_DE_SALUD"`: la dirección de tu panel de salud |
 
 Si quieres, revisa también `DEFAULT_RULES`: son las reglas que se usan cuando no se puede leer la hoja.
 

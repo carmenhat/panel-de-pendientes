@@ -5,15 +5,16 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 /* Mesa de trabajo: cabecera con tres contadores que filtran, bandeja unificada a la izquierda y agenda del día a la derecha */
+/* Paleta: fondo verde claro, tarjetas blancas, acento verde oscuro, seleccionado en lima */
 :root {
-  --bg: #f3f5f4;
+  --bg: #cfe4c5;
   --surface: #ffffff;
-  --ink: #17201e;
-  --muted: #5b6864;
-  --faint: #8a9692;
-  --line: #d8dfdc;
-  --accent: #0d6a60;
-  --accent-soft: #dcefeb;
+  --ink: #1b2a1d;
+  --muted: #4a5a4c;
+  --faint: #7f907f;
+  --line: #b7cfac;
+  --accent: #3d6740;
+  --accent-soft: #d8fa83;
   --accent-ink: #ffffff;
   --wait: #8a5600;
   --wait-bg: #fbeed3;
@@ -21,22 +22,24 @@
   --ok-bg: #e2f1e6;
   --crit: #b3261e;
   --crit-bg: #fbe3e1;
-  --chip: #e8edeb;
+  --chip: #eaf3e4;
+  --read: #3d6740;
+  --read-bg: #cfe4c5;
   --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #101614; --surface: #17201d; --ink: #e3eae7; --muted: #9ba9a4; --faint: #6f7d78; --line: #2a3532;
-    --accent: #52b9ab; --accent-soft: #19332f; --accent-ink: #0b1312;
-    --wait: #f0c262; --wait-bg: #3a2c10; --ok: #80d396; --ok-bg: #173322; --crit: #f2948c; --crit-bg: #3d1a18; --chip: #222d2a;
+    --bg: #121c13; --surface: #1a281c; --ink: #e4eee1; --muted: #a2b59f; --faint: #6c7f6a; --line: #2c3f2d;
+    --accent: #51ca6b; --accent-soft: #2c4a1f; --accent-ink: #0d1a0f;
+    --wait: #f0c262; --wait-bg: #3a2c10; --ok: #80d396; --ok-bg: #173322; --crit: #f2948c; --crit-bg: #3d1a18; --chip: #223524; --read: #cfe4c5; --read-bg: #24402a;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #101614; --surface: #17201d; --ink: #e3eae7; --muted: #9ba9a4; --faint: #6f7d78; --line: #2a3532;
-  --accent: #52b9ab; --accent-soft: #19332f; --accent-ink: #0b1312;
-  --wait: #f0c262; --wait-bg: #3a2c10; --ok: #80d396; --ok-bg: #173322; --crit: #f2948c; --crit-bg: #3d1a18; --chip: #222d2a;
+  --bg: #121c13; --surface: #1a281c; --ink: #e4eee1; --muted: #a2b59f; --faint: #6c7f6a; --line: #2c3f2d;
+  --accent: #51ca6b; --accent-soft: #2c4a1f; --accent-ink: #0d1a0f;
+  --wait: #f0c262; --wait-bg: #3a2c10; --ok: #80d396; --ok-bg: #173322; --crit: #f2948c; --crit-bg: #3d1a18; --chip: #223524; --read: #cfe4c5; --read-bg: #24402a;
   color-scheme: dark;
 }
 body {
@@ -65,6 +68,15 @@ select { background: var(--surface); border: 1px solid var(--line); border-radiu
 .bar { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: flex-end; justify-content: space-between; }
 .bar .id { display: grid; gap: 2px; }
 .bar-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.health { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 0.85rem; max-width: 100%; }
+.health:hover { border-color: var(--accent); }
+.health .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); flex: none; }
+.health[data-s="ok"] .dot { background: var(--ok); }
+.health[data-s="warn"] .dot { background: var(--wait); }
+.health[data-s="warn"] { color: var(--wait); }
+.health[data-s="err"] .dot { background: var(--crit); }
+.health[data-s="err"] { color: var(--crit); border-color: var(--crit); }
+.health #health-text { overflow-wrap: anywhere; }
 
 .quick { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .quick a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 0.85rem; }
@@ -76,12 +88,13 @@ select { background: var(--surface); border: 1px solid var(--line); border-radiu
 .notice.info { background: var(--chip); color: var(--ink); }
 .notice.warn { background: var(--wait-bg); color: var(--wait); }
 
-.counters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.counters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .counter { text-align: left; display: grid; gap: 2px; padding: 14px 16px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); }
 .counter .n { font-size: 2rem; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .counter .l { font-weight: 500; }
 .counter .s { font-size: 0.8rem; color: var(--muted); font-family: var(--font-mono); }
 .counter[data-k="espera"] .n { color: var(--wait); }
+.counter[data-k="leer"] .n { color: var(--read); }
 .counter[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 
 .grid { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: 20px; align-items: start; }
@@ -116,14 +129,20 @@ select { background: var(--surface); border: 1px solid var(--line); border-radiu
 .tag { justify-self: start; font-size: 0.7rem; font-weight: 500; padding: 1px 8px; border-radius: 4px; background: var(--chip); color: var(--muted); white-space: nowrap; }
 .tag.espera { background: var(--wait-bg); color: var(--wait); }
 .tag.mencion { background: var(--accent-soft); color: var(--accent); }
+.tag.leer { background: var(--read-bg); color: var(--read); }
 .tag.done { background: var(--ok-bg); color: var(--ok); }
 .tag.resuelto { background: var(--ok-bg); color: var(--ok); }
 .acts { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
 button.mini { padding: 2px 10px; font-size: 0.78rem; }
 .acts select { font-size: 0.8rem; padding: 2px 6px; }
 .act-msg { font-size: 0.78rem; color: var(--muted); }
-.group-head { display: flex; gap: 10px; align-items: baseline; padding: 8px 14px; background: var(--chip); border-bottom: 1px solid var(--line); font-size: 0.82rem; font-weight: 500; }
+.group-head { display: flex; gap: 10px; align-items: baseline; width: 100%; text-align: left; padding: 8px 14px; background: var(--chip); border: 0; border-bottom: 1px solid var(--line); border-radius: 0; font-size: 0.82rem; font-weight: 500; color: var(--ink); }
+.group-head:hover:not(:disabled) { border-color: var(--line); background: var(--accent-soft); }
 .group-head .meta { font-weight: 400; }
+.group-head .chev::before { content: "▸"; display: inline-block; color: var(--muted); transition: transform 0.15s; }
+.group-head[aria-expanded="true"] .chev::before { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) { .group-head .chev::before { transition: none; } }
+.group-tools { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 14px; border-bottom: 1px solid var(--line); }
 .empty { padding: 14px; color: var(--muted); font-size: 0.9rem; }
 
 .agenda { display: grid; }
@@ -176,7 +195,7 @@ details.how summary { cursor: pointer; font-weight: 500; }
   .grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 560px) {
-  .counters { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .counters { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .counter { padding: 10px; }
   .counter .n { font-size: 1.5rem; }
   .counter .l { font-size: 0.8rem; line-height: 1.25; }
@@ -197,6 +216,7 @@ details.how summary { cursor: pointer; font-weight: 500; }
       <h1>Panel de pendientes</h1>
     </div>
     <div class="bar-actions">
+      <a class="health" id="health" data-s="idle" href="https://claude.ai/artifact/TU_PANEL_DE_SALUD" target="_blank" rel="noopener"><span class="dot" aria-hidden="true"></span><span id="health-text">Salud · leyendo…</span></a>
       <a class="meta" href="#notas">Notas</a>
       <span class="meta" id="freshness">Cargando…</span>
       <button class="primary" id="btn-refresh" type="button">Actualizar</button>
@@ -209,6 +229,7 @@ details.how summary { cursor: pointer; font-weight: 500; }
   <section class="counters" aria-label="Contadores">
     <button class="counter" type="button" data-k="espera" id="cnt-espera" aria-pressed="false"><span class="n" id="n-espera">–</span><span class="l">Esperan respuesta</span><span class="s" id="s-espera">&nbsp;</span></button>
     <button class="counter" type="button" data-k="mencion" id="cnt-mencion" aria-pressed="false"><span class="n" id="n-mencion">–</span><span class="l">Te mencionan</span><span class="s" id="s-mencion">&nbsp;</span></button>
+    <button class="counter" type="button" data-k="leer" id="cnt-leer" aria-pressed="false"><span class="n" id="n-leer">–</span><span class="l">Para leer</span><span class="s" id="s-leer">&nbsp;</span></button>
     <button class="counter" type="button" data-k="info" id="cnt-info" aria-pressed="false"><span class="n" id="n-info">–</span><span class="l">Informativos</span><span class="s" id="s-info">&nbsp;</span></button>
   </section>
 
@@ -390,7 +411,7 @@ details.how summary { cursor: pointer; font-weight: 500; }
       if (!FIELDS.includes(campo) || !r.patron) { S.cfg.notes.push(`${kind} «${label}»: falta el campo o el patrón.`); continue; }
       // Segunda condición opcional: tienen que cumplirse las dos.
       if ((campo2 || r.patron2) && (!FIELDS.includes(campo2) || !r.patron2)) { S.cfg.notes.push(`${kind} «${label}»: la segunda condición necesita campo2 y patron2; se ignora la regla.`); continue; }
-      try { out.push({ ...r, campo, campo2: campo2 || null, re: new RegExp(r.patron, "i"), re2: campo2 ? new RegExp(r.patron2, "i") : null }); }
+      try { out.push({ ...r, campo, campo2: campo2 || null, destino: (r.destino || "").toLowerCase() === "leer" ? "leer" : "info", re: new RegExp(r.patron, "i"), re2: campo2 ? new RegExp(r.patron2, "i") : null }); }
       catch (_) { S.cfg.notes.push(`${kind} «${label}»: el patrón no es válido y se ignora.`); }
     }
     return out;
@@ -449,6 +470,8 @@ details.how summary { cursor: pointer; font-weight: 500; }
   const slackLabel = (m) => m.fromName + (m.bot ? " (bot)" : "");
   const slackRule = (m) => ruleFor({ isSlack: true, label: slackLabel(m) });
   const matches = (r, m) => r.re.test(fieldOf(m, r.campo)) && (!r.re2 || r.re2.test(fieldOf(m, r.campo2)));
+  // Destino de una regla: «leer» la manda a Para leer; vacío, a Informativos.
+  const ruleTipo = (rule) => (rule && rule.destino === "leer" ? "leer" : "info");
   function ruleFor(m) {
     if (S.cfg.exceptions.some((x) => matches(x, m))) return null;
     return S.cfg.rules.find((r) => matches(r, m)) || null;
@@ -470,7 +493,7 @@ details.how summary { cursor: pointer; font-weight: 500; }
       const mine = msgs.filter((m) => isMe(m.sender)).reduce((mx, m) => Math.max(mx, tsOf(m)), 0);
       const rule = ruleFor(lastIn);
       const baseTipo = mine >= tsOf(lastIn) ? "done" : "espera";
-      const tipo = rule ? "info" : baseTipo;
+      const tipo = rule ? ruleTipo(rule) : baseTipo;
       rows.push({
         id, fuente: "mail", tipo, baseTipo, rule: rule ? rule.nombre : null,
         incomplete: total > msgs.length, total, shown: msgs.length,
@@ -621,7 +644,7 @@ details.how summary { cursor: pointer; font-weight: 500; }
         const rule = rules.every((x) => x && x === rules[0]) ? rules[0] : null;
         return {
           rule: rule ? rule.nombre : null,
-          id: "dm:" + c.last.chanId, fuente: "slack", tipo: rule ? "info" : answered ? "done" : "espera", baseTipo: answered ? "done" : "espera", via: answered ? "Slack" : null, viaTs: answered ? c.myLast : 0,
+          id: "dm:" + c.last.chanId, fuente: "slack", tipo: rule ? ruleTipo(rule) : answered ? "done" : "espera", baseTipo: answered ? "done" : "espera", via: answered ? "Slack" : null, viaTs: answered ? c.myLast : 0,
           ts: theirLast, title: names.join(", "), from: group ? `Grupo · ${c.last.participants}` : "Mensaje directo",
           snippet: c.last.text, url: c.last.link, count: c.msgs.length, group, emails, unread: !c.read,
         };
@@ -712,7 +735,7 @@ details.how summary { cursor: pointer; font-weight: 500; }
           from: escalado ? "Escalado por el bot de soporte" : m.fromName + (m.bot ? " (bot)" : ""),
           snippet: th && th.parent ? slackText(th.parent.text) + (latest ? ` · Último de ${latest.name}: ${slackText(latest.text)}` : "") : slackText(m.text),
         };
-        if (rule) return { ...base, tipo: "info" };
+        if (rule) return { ...base, tipo: ruleTipo(rule) };
         if (state === "done") return { ...base, tipo: "done", via: via === "el hilo" ? "el hilo" : via, viaLabel: via === "el hilo" ? "Contestado en el hilo" : `Atendido por ${via}` };
         return { ...base, tipo: "mencion" };
       });
@@ -736,8 +759,53 @@ details.how summary { cursor: pointer; font-weight: 500; }
     renderAll();
   }
 
+  // ---------- botón del panel de salud ----------
+  // Lee la pestaña Resumen de salud_automatizaciones, sin recalcular latidos: rojo si algún estado no es OK;
+  // ámbar si el detalle lleva «⚠» o el último latido tiene más de 26 h; verde si no.
+  const HEALTH_SHEET = "ID_DE_TU_HOJA_DE_SALUD"; // ← hoja con una pestaña Resumen (proyecto, estado, detalle, timestamp)
+  const HEALTH_STALE_H = 26;
+  function offsetMadridMin(fechaAprox) {
+    const dtf = new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Madrid", hour12: false, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    const p = dtf.formatToParts(fechaAprox).reduce((acc, x) => { acc[x.type] = x.value; return acc; }, {});
+    return (Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour === 24 ? 0 : +p.hour, +p.minute, +p.second) - fechaAprox.getTime()) / 60000;
+  }
+  function parseMadrid(s) {
+    const m = String(s || "").trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})[ T]+(\d{1,2}):(\d{2})/);
+    if (!m) return 0;
+    const u = Date.UTC(+m[3], +m[2] - 1, +m[1], +m[4], +m[5]);
+    return u - offsetMadridMin(new Date(u)) * 60000;
+  }
+  async function loadHealth(refresh) {
+    S.health = { ...(S.health || {}), s: "run" }; renderHealth();
+    try {
+      const res = await call("Google Sheets", "get_values", { spreadsheetId: HEALTH_SHEET, range: "Resumen!A:E" }, refresh);
+      const rows = rowsToObjects(payloadOf(res).values || []).filter((r) => r.proyecto);
+      const now = Date.now();
+      const err = [], warn = [];
+      for (const r of rows) {
+        const t = parseMadrid(r.timestamp);
+        if ((r.estado || "").toUpperCase() !== "OK") err.push(r.proyecto);
+        else if (/⚠/.test(r.detalle || "")) warn.push(`${r.proyecto} (${r.detalle})`);
+        else if (!t || now - t > HEALTH_STALE_H * 3600000) warn.push(`${r.proyecto} (sin latido en más de ${HEALTH_STALE_H} h)`);
+      }
+      S.health = { s: "ok", total: rows.length, err, warn, at: storedAt(res) };
+    } catch (e) { S.health = { s: "fail", err: errText({ ...e, server: e && e.server || "Google Sheets" }) }; }
+    renderHealth();
+  }
+  function renderHealth() {
+    const h = S.health || { s: "idle" }, a = $("health"), t = $("health-text");
+    const names = (xs) => xs.map((x) => x.replace(/ \(.*$/, "")).slice(0, 2).join(", ") + (xs.length > 2 ? ` y ${xs.length - 2} más` : "");
+    if (h.s === "ok" && h.err.length) { a.dataset.s = "err"; t.textContent = `Salud · ${h.err.length} en error: ${names(h.err)}`; }
+    else if (h.s === "ok" && h.warn.length) { a.dataset.s = "warn"; t.textContent = `Salud · ${h.warn.length} con aviso: ${names(h.warn)}`; }
+    else if (h.s === "ok") { a.dataset.s = "ok"; t.textContent = `Salud · ${h.total} OK`; }
+    else if (h.s === "fail") { a.dataset.s = "idle"; t.textContent = "Salud · sin datos"; }
+    else { a.dataset.s = "idle"; t.textContent = "Salud · leyendo…"; }
+    a.title = h.s === "ok" ? [...h.err.map((x) => `En error: ${x}`), ...h.warn.map((x) => `Aviso: ${x}`)].join("\n") || "Todas las automatizaciones al día. Abre el panel de salud." : h.s === "fail" ? h.err : "";
+  }
+
   // ---------- clasificación con IA ----------
   const IA_RULE = "Apartados por la IA";
+  const READ_RULE = "Leídos";
   const IA_CATS = ["espera_respuesta", "mencion", "informativo"];
   const clip = (t, n) => { const x = String(t || "").replace(/\s+/g, " ").trim(); return x.length > n ? x.slice(0, n) + "…" : x; };
   const canalOf = (r) => (r.fuente === "mail" ? "correo" : r.id.startsWith("men:") ? "mención en un canal de Slack" : "mensaje directo de Slack");
@@ -834,7 +902,8 @@ details.how summary { cursor: pointer; font-weight: 500; }
       if (cr && cr.ts >= r.ts) {
         r = { ...r, corrected: true };
         if (cr.cat === "info" && r.tipo !== "info") r = { ...r, tipo: "info", rule: "Marcados a mano", manual: true };
-        else if (cr.cat === "espera" && r.tipo === "info") r = { ...r, tipo: r.baseTipo || "espera", rule: null, forced: true };
+        else if (cr.cat === "leer" && r.tipo !== "leer") r = { ...r, tipo: "leer", rule: "Marcados a mano", manual: true };
+        else if (cr.cat === "espera" && (r.tipo === "info" || r.tipo === "leer")) r = { ...r, tipo: r.baseTipo || "espera", rule: null, forced: true };
       } else {
         // Clasificación de la IA: solo para lo que no aparta ninguna regla ni se ha corregido a mano, y solo hasta el siguiente mensaje.
         const c = S.cls.get(r.id);
@@ -851,20 +920,23 @@ details.how summary { cursor: pointer; font-weight: 500; }
       // Opción C: resuelto a mano. Vuelve a salir cuando llega un mensaje posterior.
       const res = S.resolved.get(r.id);
       if (res && res.accion === "resuelto" && res.ts >= r.ts && (r.tipo === "espera" || r.tipo === "mencion")) r = { ...r, tipo: "resuelto", motivo: res.motivo, resFecha: res.fecha };
+      // Leído: pasa a Informativos, grupo «Leídos». Vuelve a Para leer si llega un mensaje posterior.
+      if (res && res.accion === "leido" && res.ts >= r.ts && r.tipo === "leer") r = { ...r, tipo: "info", rule: READ_RULE, leido: true, readRule: r.rule, resFecha: res.fecha };
       out.push(r);
     }
     return out;
   }
   function counts() {
     const rows = allRows();
-    const c = { espera: 0, mencion: 0, info: 0, done: 0, resuelto: 0, esperaMail: 0, esperaSlack: 0 };
-    for (const r of rows) { c[r.tipo]++; if (r.tipo === "espera") r.fuente === "mail" ? c.esperaMail++ : c.esperaSlack++; }
+    const c = { espera: 0, mencion: 0, leer: 0, info: 0, done: 0, resuelto: 0, esperaMail: 0, esperaSlack: 0, leerManual: 0 };
+    for (const r of rows) { c[r.tipo]++; if (r.tipo === "espera") r.fuente === "mail" ? c.esperaMail++ : c.esperaSlack++; if (r.tipo === "leer" && r.manual) c.leerManual++; }
     return c;
   }
   const FILTERS = [
     { k: "pend", label: "Pendiente", test: (r) => r.tipo === "espera" || r.tipo === "mencion" },
     { k: "espera", label: "Esperan respuesta", test: (r) => r.tipo === "espera" },
     { k: "mencion", label: "Te mencionan", test: (r) => r.tipo === "mencion" },
+    { k: "leer", label: "Para leer", test: (r) => r.tipo === "leer" },
     { k: "info", label: "Informativos", test: (r) => r.tipo === "info" },
     { k: "done", label: "Contestados", test: (r) => r.tipo === "done" },
     { k: "resuelto", label: "Resueltos", test: (r) => r.tipo === "resuelto" },
@@ -877,14 +949,17 @@ details.how summary { cursor: pointer; font-weight: 500; }
     $("n-espera").textContent = ready ? c.espera : "–";
     $("n-mencion").textContent = ready ? c.mencion : "–";
     $("n-info").textContent = ready ? c.info : "–";
+    $("n-leer").textContent = ready ? c.leer : "–";
+    $("s-leer").textContent = ready ? (c.leer ? `${c.leer - c.leerManual} por regla · ${c.leerManual} a mano` : "nada pendiente de leer") : " ";
     $("s-espera").textContent = ready ? `${c.esperaMail} correo · ${c.esperaSlack} Slack` : " ";
     const esc = allRows().filter((r) => r.tipo === "mencion" && r.escalado).length;
     $("s-mencion").textContent = ready ? (esc ? `${esc} ${esc === 1 ? "escalado" : "escalados"} del bot de soporte` : "en canales de Slack") : " ";
     const infoRows = allRows().filter((r) => r.tipo === "info");
-    const ruleCount = new Set(infoRows.filter((r) => r.rule !== IA_RULE).map((r) => r.rule)).size;
+    const ruleCount = new Set(infoRows.filter((r) => r.rule !== IA_RULE && r.rule !== READ_RULE).map((r) => r.rule)).size;
     const byIa = infoRows.filter((r) => r.rule === IA_RULE).length;
-    $("s-info").textContent = ready ? `apartados por ${ruleCount} ${ruleCount === 1 ? "regla" : "reglas"}${byIa ? ` · ${byIa} por la IA` : ""}` : " ";
-    for (const k of ["espera", "mencion", "info"]) $("cnt-" + k).setAttribute("aria-pressed", String(S.filter === k));
+    const read = infoRows.filter((r) => r.rule === READ_RULE).length;
+    $("s-info").textContent = ready ? `apartados por ${ruleCount} ${ruleCount === 1 ? "regla" : "reglas"}${byIa ? ` · ${byIa} por la IA` : ""}${read ? ` · ${read} ${read === 1 ? "leído" : "leídos"}` : ""}` : " ";
+    for (const k of ["espera", "mencion", "leer", "info"]) $("cnt-" + k).setAttribute("aria-pressed", String(S.filter === k));
   }
   function renderChips() {
     const rows = allRows().filter((r) => S.source === "all" || r.fuente === S.source);
@@ -954,12 +1029,13 @@ details.how summary { cursor: pointer; font-weight: 500; }
     if (!who || (r.emails && r.emails.length > 1) || r.group) return null;
     return { campo: "slack", patron: "^" + escRe(who) + "$", label: who };
   }
-  async function writeSenderRule(r, sr) {
+  async function writeSenderRule(r, sr, destino) {
+    const leer = destino === "leer";
     await S.mcp.callTool("Google Sheets", "append_values", {
-      spreadsheetId: STATE_SHEET, range: "reglas!A:G",
-      values: [[cellText(`Remitente: ${sr.label}`), sr.campo, cellText(sr.patron), "", "", "sí", `Creada desde el panel el ${nowText()}`]],
+      spreadsheetId: STATE_SHEET, range: "reglas!A:H",
+      values: [[cellText(`Remitente: ${sr.label}`), sr.campo, cellText(sr.patron), "", "", "sí", `Creada desde el panel el ${nowText()}${leer ? " (para leer)" : ""}`, leer ? "leer" : ""]],
     }, { cache: false });
-    S.cfg.rules.push({ nombre: `Remitente: ${sr.label}`, campo: sr.campo, patron: sr.patron, re: new RegExp(sr.patron, "i"), re2: null });
+    S.cfg.rules.push({ nombre: `Remitente: ${sr.label}`, campo: sr.campo, patron: sr.patron, destino: leer ? "leer" : "info", re: new RegExp(sr.patron, "i"), re2: null });
   }
   function actionsFor(r) {
     const box = el("div", { class: "acts" });
@@ -990,9 +1066,10 @@ details.how summary { cursor: pointer; font-weight: 500; }
       });
       box.append(b, msg);
     }
-    if (r.tipo === "espera" || r.tipo === "mencion" || r.tipo === "done") {
-      const ib = el("button", { type: "button", class: "mini", text: "Informativo" });
-      ib.addEventListener("click", () => {
+    // «Informativo» y «Para leer»: solo este, o todos los del remitente (crea una regla).
+    const markMenu = (cat, label) => {
+      const btn = el("button", { type: "button", class: "mini", text: label });
+      btn.addEventListener("click", () => {
         const sr = senderRule(r);
         const msg = el("span", { class: "act-msg" });
         const only = el("button", { type: "button", class: "mini primary", text: "Solo este" });
@@ -1002,24 +1079,48 @@ details.how summary { cursor: pointer; font-weight: 500; }
         cancel.addEventListener("click", () => renderInbox());
         only.addEventListener("click", async () => {
           busy(true); msg.textContent = "Guardando…";
-          try { await writeCorrection(r, "info"); renderAll(); } catch (e) { msg.textContent = writeErr(e); busy(false); }
+          try { await writeCorrection(r, cat); renderAll(); } catch (e) { msg.textContent = writeErr(e); busy(false); }
         });
         if (all) all.addEventListener("click", async () => {
           busy(true); msg.textContent = "Creando la regla…";
-          try { await writeCorrection(r, "info"); await writeSenderRule(r, sr); msg.textContent = ""; renderAll(); }
+          try { await writeCorrection(r, cat); await writeSenderRule(r, sr, cat === "leer" ? "leer" : ""); msg.textContent = ""; renderAll(); }
           catch (e) { msg.textContent = writeErr(e); busy(false); }
         });
         box.replaceChildren(only, all, cancel, msg);
       });
-      box.append(ib);
-    } else if (r.tipo === "info") {
-      const nb2 = el("button", { type: "button", class: "mini", text: "Necesita respuesta" });
+      return btn;
+    };
+    const direct = (cat, label) => {
+      const b = el("button", { type: "button", class: "mini", text: label });
       const msg = el("span", { class: "act-msg" });
-      nb2.addEventListener("click", async () => {
-        nb2.disabled = true; msg.textContent = "Guardando…";
-        try { await writeCorrection(r, "espera"); renderAll(); } catch (e) { msg.textContent = writeErr(e); nb2.disabled = false; }
+      b.addEventListener("click", async () => {
+        b.disabled = true; msg.textContent = "Guardando…";
+        try { await writeCorrection(r, cat); renderAll(); } catch (e) { msg.textContent = writeErr(e); b.disabled = false; }
       });
-      box.append(nb2, msg);
+      return [b, msg];
+    };
+    if (r.tipo === "espera" || r.tipo === "mencion" || r.tipo === "done") {
+      box.append(markMenu("info", "Informativo"), markMenu("leer", "Para leer"));
+    } else if (r.tipo === "leer") {
+      const rb = el("button", { type: "button", class: "mini primary", text: "Leído" });
+      const msg = el("span", { class: "act-msg" });
+      rb.addEventListener("click", async () => {
+        rb.disabled = true; msg.textContent = "Guardando…";
+        try { await writeResolution(r, "leido", ""); renderAll(); }
+        catch (e) { msg.textContent = writeErr(e); rb.disabled = false; }
+      });
+      box.append(rb, msg, ...direct("espera", "Necesita respuesta"), ...direct("info", "Informativo"));
+    } else if (r.tipo === "info" && r.leido) {
+      const b = el("button", { type: "button", class: "mini", text: "No leído" });
+      const msg = el("span", { class: "act-msg" });
+      b.addEventListener("click", async () => {
+        b.disabled = true; msg.textContent = "Guardando…";
+        try { await writeResolution(r, "reabierto", ""); renderAll(); }
+        catch (e) { msg.textContent = writeErr(e); b.disabled = false; }
+      });
+      box.append(b, msg);
+    } else if (r.tipo === "info") {
+      box.append(...direct("espera", "Necesita respuesta"), markMenu("leer", "Para leer"));
     }
     const nb = el("button", { type: "button", class: "mini", text: "Nota" });
     nb.addEventListener("click", () => openNoteFromRow(r));
@@ -1027,7 +1128,7 @@ details.how summary { cursor: pointer; font-weight: 500; }
     return box;
   }
   function rowItem(r) {
-    const tagText = r.tipo === "espera" ? (r.fuente === "mail" ? "Correo" : "Slack directo") : r.tipo === "mencion" ? "Mención"
+    const tagText = r.tipo === "espera" ? (r.fuente === "mail" ? "Correo" : "Slack directo") : r.tipo === "mencion" ? "Mención" : r.tipo === "leer" ? "Para leer"
       : r.tipo === "done" ? (r.viaLabel || (r.via ? `Contestado por ${r.via}` : "Contestado")) : r.tipo === "resuelto" ? "Resuelto" : (r.rule || "Informativo");
     const sub = [r.from];
     if (r.count > 1) sub.push(`${r.count} mensajes`);
@@ -1036,6 +1137,8 @@ details.how summary { cursor: pointer; font-weight: 500; }
     if (r.via && r.viaTs) sub.push(`tu respuesta por ${r.via}: ${whenText(r.viaTs)}`);
     if (r.unread && r.fuente === "slack" && r.id.startsWith("men:")) sub.push("hilo sin leer entero");
     if (r.forced) sub.push("marcado a mano como «necesita respuesta»");
+    if (r.tipo === "leer") sub.push(r.manual ? "marcado a mano para leer" : `regla «${r.rule}»`);
+    if (r.leido) sub.push(`leído${r.resFecha ? ` el ${r.resFecha}` : ""}`);
     if (r.ia && r.tipo !== "done" && r.tipo !== "resuelto") sub.push(`IA: ${r.ia}`);
     if (r.tipo === "resuelto") sub.push(`resuelto ${r.motivo ? r.motivo.toLowerCase() : "sin motivo"}${r.resFecha ? ` el ${r.resFecha}` : ""}`);
     return el("div", { class: "item" },
@@ -1047,6 +1150,10 @@ details.how summary { cursor: pointer; font-weight: 500; }
         actionsFor(r)),
       el("span", { class: "when", text: whenText(r.ts) }));
   }
+  // Grupos de Informativos: arrancan plegados salvo los que conviene revisar; lo que abras o pliegues vale mientras el panel siga abierto.
+  const GROUP_OPEN = new Map();
+  const GROUP_DEFAULT_OPEN = ["Marcados a mano", IA_RULE];
+  const groupIsOpen = (name) => (GROUP_OPEN.has(name) ? GROUP_OPEN.get(name) : GROUP_DEFAULT_OPEN.includes(name));
   function renderInbox() {
     const box = $("inbox"); box.replaceChildren();
     const anyOk = [S.gmail, S.dm, S.men].some((x) => x.s === "ok");
@@ -1060,10 +1167,27 @@ details.how summary { cursor: pointer; font-weight: 500; }
     if (S.filter === "info") {
       const groups = new Map();
       for (const r of rows) { const g = groups.get(r.rule) || []; g.push(r); groups.set(r.rule, g); }
+      const names = [...groups.keys()];
+      const allOpen = names.every(groupIsOpen);
+      const tog = el("button", { type: "button", class: "link", text: allOpen ? "Plegar todo" : "Desplegar todo" });
+      tog.addEventListener("click", () => {
+        for (const n of names) GROUP_OPEN.set(n, !allOpen);
+        renderInbox();
+        const t = $("inbox").querySelector(".group-tools button"); if (t) t.focus();
+      });
+      box.append(el("div", { class: "group-tools" }, el("span", { class: "meta", text: `${names.length} ${names.length === 1 ? "grupo" : "grupos"}` }), tog));
       for (const [name, list] of groups) {
+        const open = groupIsOpen(name);
         const nifs = list.map((r) => r.nif).filter(Boolean);
-        box.append(el("div", { class: "group-head" }, el("span", { text: name }), el("span", { class: "meta", text: `${list.length}${nifs.length ? ` · NIF: ${nifs.join(", ")}` : ""}` })));
-        list.forEach((r) => box.append(rowItem(r)));
+        const head = el("button", { type: "button", class: "group-head", "aria-expanded": String(open), "data-g": name },
+          el("span", { class: "chev", "aria-hidden": "true" }), el("span", { text: name }), el("span", { class: "meta", text: `${list.length}${nifs.length ? ` · NIF: ${nifs.join(", ")}` : ""}` }));
+        head.addEventListener("click", () => {
+          GROUP_OPEN.set(name, !open);
+          renderInbox();
+          const h = [...$("inbox").querySelectorAll(".group-head")].find((x) => x.dataset.g === name); if (h) h.focus();
+        });
+        box.append(head);
+        if (open) list.forEach((r) => box.append(rowItem(r)));
       }
       return;
     }
@@ -1131,6 +1255,7 @@ details.how summary { cursor: pointer; font-weight: 500; }
         [`Correo: la bandeja de los últimos ${L.dias} días (hasta ${L.correos_bandeja} hilos) y los enviados del mismo periodo (hasta ${L.enviados}).`],
         [`Slack: mensajes directos y menciones en canales de los últimos ${L.dias} días, ${L.slack_paginas} ${L.slack_paginas === 1 ? "página" : "páginas"} de ${L.slack_por_pagina} por búsqueda.`],
         ["Agenda: los eventos de hoy. Solo cuentan como reuniones los que tienen a otra persona invitada."],
+        [`Salud: la pestaña Resumen de la hoja salud_automatizaciones, sin recalcular latidos. El botón sale en rojo si algún estado no es OK; en ámbar si el detalle lleva «⚠» o el último latido tiene más de ${HEALTH_STALE_H} h; en verde si no. Abre el panel de salud.`],
         ["Si una fuente llega a su tope, se indica «puede haber más»."]),
       sec("Cómo se decide cada estado",
         ["Un hilo de correo está contestado si tu último mensaje en él es posterior al último recibido."],
@@ -1140,7 +1265,9 @@ details.how summary { cursor: pointer; font-weight: 500; }
         ["Entre canales se une por persona: si te escriben por correo y tu último mensaje a esa persona por Slack es posterior (o al revés), pasa a «Contestado por Slack» o «Contestado por correo». No cuentan los correos en copia oculta. Si con la misma persona llevas dos temas, revísalo en Contestados."],
         ["«Informativo» lo aparta a mano: «Solo este» guarda la corrección en la pestaña correcciones; «Todos los de…» crea además una regla por remitente en la pestaña reglas. En Informativos, «Necesita respuesta» lo devuelve. Las correcciones sirven de ejemplos a la IA."],
         ["«Resuelto» guarda el elemento en la pestaña resueltos de la hoja con su motivo. Vuelve a salir si llega un mensaje posterior; «Reabrir» lo devuelve antes."],
-        ["Esperan respuesta = hilos de correo sin contestar que no aparta ninguna regla, más conversaciones directas de Slack sin contestar. Te mencionan = menciones en canales. Informativos = correos y mensajes de Slack apartados por regla."]),
+        ["En Informativos, cada grupo se pliega y despliega desde su cabecera, o todos a la vez con «Desplegar todo» / «Plegar todo». Al abrir el panel arrancan plegados, salvo «Marcados a mano» y «Apartados por la IA»; lo que cambies vale mientras el panel siga abierto."],
+        ["Para leer = avisos que no piden respuesta pero hay que leer. Entran por una regla con destino «leer» o a mano con «Para leer» («Solo este» o «Todos los de…», que crea la regla). No cuentan como pendientes. «Leído» los pasa a Informativos, grupo «Leídos», y se guarda en la pestaña resueltos; vuelven a Para leer si llega un mensaje posterior, y «No leído» los devuelve antes."],
+        ["Esperan respuesta = hilos de correo sin contestar que no aparta ninguna regla, más conversaciones directas de Slack sin contestar. Te mencionan = menciones en canales. Para leer = apartados por una regla con destino «leer» o marcados a mano. Informativos = correos y mensajes de Slack apartados por regla, por la IA, a mano o ya leídos."]),
       sec("Clasificación con IA",
         [L.ia_lotes ? `Después de cada actualización, la IA (modelo rápido) clasifica lo pendiente que aún no ha visto: hasta ${L.ia_lotes} ${L.ia_lotes === 1 ? "tanda" : "tandas"} de ${L.ia_lote}. Lo que no entra se clasifica en la siguiente actualización.` : "Desactivada: el límite ia_lotes vale 0 en la hoja de estado."],
         ["Decide entre espera respuesta, mención e informativo. Solo cambia algo cuando dice informativo: el elemento pasa a «Apartados por la IA», con el motivo debajo. Ante la duda, lo deja pendiente."],
@@ -1148,11 +1275,11 @@ details.how summary { cursor: pointer; font-weight: 500; }
         ["El resultado se guarda en la pestaña clasificacion de la hoja de estado y no se vuelve a pagar. Si llega un mensaje nuevo al mismo hilo, se clasifica otra vez."],
         ["Recibe el remitente, el asunto y el principio del texto. No tiene herramientas ni acceso a nada más, y tiene orden de no seguir instrucciones escritas dentro de los mensajes. Gasta uso de tu cuenta de Claude; la primera vez pide permiso."],
         ["Si se equivoca, «Necesita respuesta» o «Informativo» lo corrigen y la corrección le sirve de ejemplo."]),
-      sec("Reglas que apartan correos",
-        ...(S.cfg.rules.length ? S.cfg.rules.map((r) => [el("strong", { text: r.nombre || "Sin nombre" }), `: ${r.campo} coincide con `, code(r.patron), r.re2 ? [` y ${r.campo2} con `, code(r.patron2)] : null]) : [["No hay reglas activas."]]),
+      sec("Reglas que apartan mensajes",
+        ...(S.cfg.rules.length ? S.cfg.rules.map((r) => [el("strong", { text: r.nombre || "Sin nombre" }), `: ${r.campo} coincide con `, code(r.patron), r.re2 ? [` y ${r.campo2} con `, code(r.patron2)] : null, r.destino === "leer" ? " → Para leer" : null]) : [["No hay reglas activas."]]),
         ...(S.cfg.exceptions.length ? S.cfg.exceptions.map((x) => ["Nunca se aparta: ", x.campo, " coincide con ", code(x.patron), x.re2 ? [` y ${x.campo2} con `, code(x.patron2)] : null, x.motivo ? ` (${x.motivo})` : ""]) : []),
         ["En Slack, las reglas usan el campo «slack»: el nombre de quien escribe, con «(bot)» si es una aplicación. Una conversación directa se aparta si la regla coge todos sus mensajes."],
-        ["Se editan en la ", el("a", { href: STATE_URL, target: "_blank", rel: "noopener", text: "hoja de estado" }), ". Los patrones no distinguen mayúsculas."]),
+        ["Se editan en la ", el("a", { href: STATE_URL, target: "_blank", rel: "noopener", text: "hoja de estado" }), ". Los patrones no distinguen mayúsculas. La columna destino decide adónde van: vacía, a Informativos; «leer», a Para leer."]),
       sec("Notas",
         ["Cada nota es un archivo markdown en tu carpeta de notas de Drive, con el nombre «concepto - AAAA.MM.DD - contexto». Si ya existe, se añade (2), (3). Nunca se sobrescribe."],
         ["La cabecera lleva fecha, asunto, persona, enlace al origen y estado. El único título es el nombre del archivo."],
@@ -1161,7 +1288,7 @@ details.how summary { cursor: pointer; font-weight: 500; }
         ["No las edites desde Drive en el navegador: crea un Google Doc y se pierde el markdown. Desde el panel o desde un editor de texto."]),
       sec("Datos y seguridad",
         [`Los datos valen ${L.minutos_validez} minutos. «Actualizar» los pide de nuevo; al volver a la pestaña se releen si han caducado.`],
-        ["El panel no envía ni borra nada. Solo escribe cuando lo pides: en las pestañas resueltos, correcciones, reglas y clasificacion de la hoja de estado, y en la carpeta de notas y su índice."],
+        ["El panel no envía ni borra nada. Solo escribe cuando lo pides: en las pestañas resueltos (también lo leído), correcciones, reglas y clasificacion de la hoja de estado, y en la carpeta de notas y su índice."],
         ["Los mensajes se muestran como texto plano y sus enlaces solo llevan a Gmail, Slack, Google Drive y Calendar. Los accesos rápidos admiten cualquier dirección https, porque salen de la hoja de estado."]),
     );
     if (S.cfg.notes.length) box.prepend(el("div", { class: "panel" }, S.cfg.notes.map((n) => notice(n, "warn"))));
@@ -1468,14 +1595,14 @@ details.how summary { cursor: pointer; font-weight: 500; }
     S.loading = true; renderFreshness();
     await loadConfig(refresh);
     renderQuick(); renderHow();
-    await Promise.all([loadGmail(refresh), loadDm(refresh), loadMen(refresh), loadMine(refresh), loadCal(refresh), loadNotes(refresh)]);
+    await Promise.all([loadGmail(refresh), loadDm(refresh), loadMen(refresh), loadMine(refresh), loadCal(refresh), loadNotes(refresh), loadHealth(refresh)]);
     S.loading = false; S.lastLoad = Date.now(); renderAll();
     classify();
   }
 
   $("btn-refresh").addEventListener("click", () => loadAll(true));
   $("f-source").addEventListener("change", (e) => { S.source = e.target.value; renderChips(); renderInbox(); });
-  for (const k of ["espera", "mencion", "info"]) $("cnt-" + k).addEventListener("click", () => setFilter(S.filter === k ? "pend" : k));
+  for (const k of ["espera", "mencion", "leer", "info"]) $("cnt-" + k).addEventListener("click", () => setFilter(S.filter === k ? "pend" : k));
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden && S.lastLoad && Date.now() - S.lastLoad > S.cfg.limits.minutos_validez * 60000) loadAll(false);
   });
