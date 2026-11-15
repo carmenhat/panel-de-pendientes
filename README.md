@@ -1,6 +1,6 @@
 # Panel de pendientes
 
-Un panel que junta en una pantalla lo que espera algo de mí en Gmail y en Slack, aparta lo que es solo informativo, deja aparte lo que tengo que leer, me enseña la agenda de hoy y guarda notas. Está hecho como artifact de Claude: lee mis conectores y usa la IA solo para lo que una regla no puede decidir.
+Un panel que junta en una pantalla lo que espera algo de mí en Gmail y en Slack, aparta lo que es solo informativo, deja aparte lo que tengo que leer, me dice quién espera algo de mí y qué espero yo, me enseña la agenda de hoy y guarda tareas y notas. Está hecho como artifact de Claude: lee mis conectores y usa la IA solo para lo que una regla no puede decidir.
 
 > **Antes de clonar:** esto no es una aplicación que se instale. Es un único archivo HTML que funciona **publicado como artifact de Claude**, con los conectores de tu cuenta. Abierto en un navegador normal no hace nada. Cómo montarlo: [`docs/GUIA_DESPLIEGUE.md`](docs/GUIA_DESPLIEGUE.md).
 >
@@ -15,6 +15,7 @@ Cómo lo he adaptado:
 - lo informativo se aparta pero nunca desaparece;
 - un mensaje se da por contestado aunque haya contestado por el otro canal;
 - lo que no pide respuesta pero hay que leer tiene su propio apartado, «Para leer»;
+- las esperas van en las dos direcciones: quién espera algo de mí y de quién espero yo respuesta;
 - las notas son archivos markdown en Drive.
 
 ## Cómo está montado
@@ -22,7 +23,8 @@ Cómo lo he adaptado:
 | Pieza | Dónde vive | Qué hace |
 | --- | --- | --- |
 | El panel | `index.html`, publicado como artifact de Claude | Lee Gmail, Slack y Calendar, decide el estado de cada cosa y lo pinta |
-| La hoja de estado | Una hoja de Google | Reglas, excepciones, accesos rápidos y límites, que edito yo; y lo resuelto, corregido y clasificado, que escribe el panel añadiendo filas |
+| La hoja de estado | Una hoja de Google | Reglas, excepciones, accesos rápidos y límites, que edito yo; y lo resuelto, corregido y clasificado y las tareas, que escribe el panel añadiendo filas |
+| El registro de casos | Otra hoja de Google, opcional | Los casos abiertos con proveedores y su estado. El panel solo la lee, para el bloque «Esperas» |
 | Las notas | Una carpeta de Drive y una hoja índice | Una nota markdown por tema; nunca se sobrescribe ninguna |
 | La IA | Dentro del artifact | Solo decide si lo que queda pendiente es informativo. Sin herramientas: no puede escribir, enviar ni borrar |
 | El botón de salud | Cabecera del panel | Lee el resumen de otra hoja, la de mi panel de salud de automatizaciones, y se pone en rojo o ámbar si alguna falla. Es opcional |
@@ -31,8 +33,8 @@ Cómo lo he adaptado:
 
 | Carpeta o archivo | Qué es | Estado |
 | --- | --- | --- |
-| [`index.html`](index.html) | El panel entero: HTML, estilos y JavaScript en un solo archivo | 🧪 pruebas |
-| [`plantilla_hoja_estado/`](plantilla_hoja_estado/) | Una plantilla CSV por pestaña de la hoja de estado, y la del índice de notas | ✅ |
+| [`index.html`](index.html) | El panel entero: HTML, estilos y JavaScript en un solo archivo | ✅ |
+| [`plantilla_hoja_estado/`](plantilla_hoja_estado/) | Una plantilla CSV por pestaña de la hoja de estado, la del índice de notas y la del registro de casos | ✅ |
 | [`herramientas/copia_publica.py`](herramientas/copia_publica.py) | Genera esta copia a partir del panel real, quitando los datos personales | ✅ |
 | [`docs/`](docs/) | Cómo funciona y cómo montarlo | ✅ |
 
@@ -50,14 +52,14 @@ Cómo lo he adaptado:
 | Archivo | Qué contiene |
 | --- | --- |
 | [`docs/COMO_FUNCIONA.md`](docs/COMO_FUNCIONA.md) | El principio de diseño, qué hace en cada carga, cómo decide cada estado, la IA, las notas, la seguridad y las decisiones cerradas |
-| [`docs/GUIA_DESPLIEGUE.md`](docs/GUIA_DESPLIEGUE.md) | Montarlo en tu cuenta: hoja, notas, configuración, publicación y comprobaciones |
+| [`docs/GUIA_DESPLIEGUE.md`](docs/GUIA_DESPLIEGUE.md) | Montarlo en tu cuenta: hoja, notas, registro de casos, configuración, publicación y comprobaciones |
 
 ## Pendiente
 
 | Qué | Por qué está pendiente |
 | --- | --- |
-| Quién espera algo de mí, agrupado por persona | Siguiente entrega; necesita cruzar con mi registro de casos abiertos |
-| Mensaje abierto, etiquetas, agenda navegable, «cargar más», lo que espero yo, posponer, antigüedad | Mejoras de uso, después de lo anterior |
+| Agenda navegable, «cargar más», posponer hasta una fecha, antigüedad a la vista | Mejoras de uso; lo siguiente |
+| Tareas: editar el texto y añadir fecha | De momento se quita y se escribe otra |
 | v2: buscar contexto, proponer respuestas como borrador, esquematizar notas con IA | Va después de cerrar la v1 |
 | v3: que otros flujos (el resumen de la mañana, el semanal) lean las notas | Después de la v2 |
 
@@ -69,7 +71,7 @@ El panel real lleva mis datos (correo, ids, remitentes, nombres). Esta copia se 
 python herramientas/copia_publica.py <panel real>/index.html index.html <ruta>/datos_privados.json
 ```
 
-El script se para sin escribir nada si una sustitución no aparece las veces previstas (el panel ha cambiado) o si en la salida queda cualquier dato prohibido, un correo, un id de Slack o algo con forma de id de Drive.
+El script se para sin escribir nada si una sustitución no aparece las veces previstas (el panel ha cambiado) o si en la salida queda cualquier dato prohibido, un correo, un id de Slack o algo con forma de id de Drive. Una palabra en mayúsculas del código puede parecer un id de Slack: las que no lo son se apuntan en `slack_permitidos`.
 
 ### Cómo lo hago yo
 
@@ -83,4 +85,4 @@ El panel real vive en un repo privado del trabajo y `datos_privados.json` en mi 
 
 ---
 
-Última actualización: 20/10/2026
+Última actualización: 15/11/2026

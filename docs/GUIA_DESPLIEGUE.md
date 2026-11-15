@@ -13,8 +13,8 @@ La clasificación con IA gasta uso de tu cuenta de Claude. Si no la quieres, pon
 ## 1. La hoja de estado
 
 1. Crea una hoja de cálculo de Google.
-2. Crea una pestaña por cada archivo de [`plantilla_hoja_estado/`](../plantilla_hoja_estado/), salvo `notas_indice.csv`: `reglas`, `excepciones`, `botones`, `limites`, `resueltos`, `correcciones` y `clasificacion`. **Los nombres tienen que ser exactos**: el panel lee las pestañas por nombre, no por posición.
-3. Importa en cada pestaña su CSV. Las de `reglas`, `excepciones`, `botones` y `limites` traen ejemplos: cámbialos por los tuyos. Las otras tres solo llevan la cabecera; las rellena el panel.
+2. Crea una pestaña por cada archivo de [`plantilla_hoja_estado/`](../plantilla_hoja_estado/), salvo `notas_indice.csv` y `casos.csv`: `reglas`, `excepciones`, `botones`, `limites`, `resueltos`, `correcciones`, `clasificacion` y `tareas`. **Los nombres tienen que ser exactos**: el panel lee las pestañas por nombre, no por posición.
+3. Importa en cada pestaña su CSV. Las de `reglas`, `excepciones`, `botones` y `limites` traen ejemplos: cámbialos por los tuyos. Las otras cuatro solo llevan la cabecera; las rellena el panel.
 4. En `botones`, el enlace va como texto (`https://…`), no como chip de Google: la lectura de la hoja solo devuelve el texto visible.
 
 Las reglas usan expresiones regulares sin distinguir mayúsculas. El campo puede ser `remitente`, `asunto`, `etiqueta` (de Gmail) o `slack` (el nombre de quien escribe, con « (bot)» detrás si es una aplicación). Con `campo2` y `patron2` se tienen que cumplir las dos condiciones. Una regla solo cuenta si en `activa` pone `sí`. Con `destino` vacío, lo que coge va a Informativos; con `leer`, a «Para leer».
@@ -24,7 +24,15 @@ Las reglas usan expresiones regulares sin distinguir mayúsculas. El campo puede
 1. Crea una carpeta de Drive para las notas y, dentro, una subcarpeta `_anteriores`.
 2. Crea otra hoja de cálculo con una pestaña llamada `notas` e importa en ella [`notas_indice.csv`](../plantilla_hoja_estado/notas_indice.csv).
 
-## 3. Configurar el panel
+## 3. El registro de casos (opcional)
+
+Sirve para que el bloque «Esperas» cuente también los casos abiertos con proveedores. Si no llevas un registro así, sáltate este paso: el bloque avisa de que no ha podido leer los casos y el resto funciona igual.
+
+1. Crea una hoja de cálculo con una pestaña llamada `Casos` e importa en ella [`casos.csv`](../plantilla_hoja_estado/casos.csv). Las columnas se leen por su nombre, dentro de las columnas A a Q.
+2. El panel solo mira la columna `estado`: «Esperando a mi empresa» o «Pendiente de cliente» van a «Te esperan»; «Esperando al proveedor», a «Esperas tú». Cualquier otro estado no sale.
+3. En `ids hilo` van los ids de los hilos de Gmail del caso, separados por comas: así un hilo que ya está en un caso no se cuenta dos veces.
+
+## 4. Configurar el panel
 
 Abre [`index.html`](../index.html) y rellena las líneas marcadas con `←`:
 
@@ -36,12 +44,13 @@ Abre [`index.html`](../index.html) y rellena las líneas marcadas con `←`:
 | `NOTES_FOLDER` | El id de la carpeta de notas |
 | `NOTES_OLD_FOLDER` | El id de la subcarpeta `_anteriores` |
 | `NOTES_SHEET` | El id de la hoja índice de notas |
+| `DIRECTORIO` | Opcional. El id de la hoja del registro de casos (paso 3) |
 | `HEALTH_SHEET` | Opcional. El id de la hoja de tu panel de salud, con una pestaña `Resumen` (proyecto, estado, detalle, timestamp en `dd/mm/aaaa hh:mm`). Si no tienes, el botón sale en gris |
 | Enlace del botón de salud | En el HTML, `href="https://claude.ai/artifact/TU_PANEL_DE_SALUD"`: la dirección de tu panel de salud |
 
 Si quieres, revisa también `DEFAULT_RULES`: son las reglas que se usan cuando no se puede leer la hoja.
 
-## 4. Publicarlo
+## 5. Publicarlo
 
 Pídele a Claude, en una conversación, que publique tu `index.html` como artifact con estas capacidades:
 
@@ -55,10 +64,12 @@ Pídele a Claude, en una conversación, que publique tu `index.html` como artifa
 
 La primera vez que lo abras te pedirá permiso para cada conector y para la IA.
 
-## 5. Comprobarlo
+## 6. Comprobarlo
 
 - Que los contadores cuadran con tu bandeja revisada a mano.
 - Que una corrección («Informativo» o «Necesita respuesta») aparece como fila nueva en `correcciones`.
 - Que una nota crea su archivo en la carpeta y su fila en la hoja índice.
+- Que una tarea añadida aparece como fila nueva en `tareas`.
+- Que «Esperas tú» enseña un correo tuyo de hace unos días que sigue sin respuesta.
 
 Si algo no se lee, el bloque correspondiente lo dice con su error y su botón de reintentar.

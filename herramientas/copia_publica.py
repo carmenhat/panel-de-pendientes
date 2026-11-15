@@ -13,6 +13,8 @@ Es estricto a propósito:
   - Después revisa la salida: si queda alguno de los textos prohibidos, un correo
     que no esté permitido, algo con forma de id de usuario de Slack o algo con
     forma de id de Drive, se para y no escribe nada.
+    Una palabra en mayúsculas del código puede tener forma de id de Slack: las
+    que se sabe que no lo son van en la lista «slack_permitidos».
 
 Solo usa la biblioteca estándar de Python.
 """
@@ -68,8 +70,9 @@ def revisar(texto, datos):
     for correo in sorted(set(re.findall(PATRON_CORREO, texto))):
         if correo.lower() not in correos_ok:
             fallos.append(f"correo no permitido: {correo}")
+    slack_ok = set(datos.get("slack_permitidos", []))
     for slack_id in sorted(set(re.findall(PATRON_SLACK, texto))):
-        if slack_id != MARCADOR_SLACK:
+        if slack_id != MARCADOR_SLACK and slack_id not in slack_ok:
             fallos.append(f"posible id de Slack: {slack_id}")
     ids_ok = set(datos.get("ids_permitidos", []))
     for cadena in sorted(set(re.findall(PATRON_ID, texto))):

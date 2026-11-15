@@ -10,8 +10,8 @@ La IA entra solo en cuatro pasos: clasificar, buscar contexto, proponer respuest
 flowchart TD
   F["Fuentes<br/>Gmail · Slack · Google Calendar"] --> S["Software de siempre<br/>reglas fijas, quitar lo contestado, contar, ordenar, avisar de topes"]
   S --> IA["IA, solo en lo que queda<br/>¿esto pide algo o es informativo?"]
-  IA --> P["Panel<br/>contadores · bandeja unificada · agenda · accesos rápidos · notas"]
-  H[("Hoja de estado<br/>reglas · excepciones · botones · límites · resueltos · correcciones · clasificación")] -- lee --> S
+  IA --> P["Panel<br/>contadores · bandeja unificada · esperas · agenda · tareas · accesos rápidos · notas"]
+  H[("Hoja de estado<br/>reglas · excepciones · botones · límites · resueltos · correcciones · clasificación · tareas")] -- lee --> S
   P -- añade filas --> H
   P -- crea --> N[("Notas en Drive<br/>markdown + hoja índice")]
 ```
@@ -22,8 +22,10 @@ flowchart TD
 2. **Gmail**: bandeja y enviados de los últimos 3 días, cruzados por hilo. Los hilos que llegan incompletos se abren enteros (hasta 10).
 3. **Slack**: mensajes directos (se lee cada conversación, hasta 15) y menciones (se agrupan por hilo y se lee cada hilo, hasta 15). Además, mis directos enviados y los perfiles, para unir a cada persona con su correo.
 4. **Calendar**: eventos de hoy, solo reuniones con otras personas.
-5. Aplica reglas, correcciones, IA, resueltos y leídos (abajo), y pinta los contadores, la bandeja con filtros, la agenda, los accesos rápidos y las notas.
-6. Si está configurado, lee el resumen del panel de salud y pinta su botón en la cabecera.
+5. **Esperas**: mis enviados de los últimos 14 días (hasta 50 hilos) y, si está configurado, la pestaña `Casos` del registro de casos.
+6. Lee las tareas de la hoja de estado.
+7. Aplica reglas, correcciones, IA, resueltos y leídos (abajo), y pinta los contadores, la bandeja con filtros, las esperas, la agenda, las tareas, los accesos rápidos y las notas.
+8. Si está configurado, lee el resumen del panel de salud y pinta su botón en la cabecera.
 
 Cada bloque se pinta cuando llega su fuente. Si una falla, sale su aviso y su botón de reintentar, y el resto sigue. Cuando un límite corta, el panel dice cuánto ha leído y si puede haber más. Los datos valen 5 minutos: «Actualizar» los vuelve a pedir y, al volver a la pestaña, se releen si han caducado.
 
@@ -53,6 +55,29 @@ Son avisos que no piden respuesta pero que hay que leer. Tienen su contador y su
 
 Lee la pestaña `Resumen` de la hoja de un panel de salud de automatizaciones (columnas proyecto, estado, detalle, timestamp) y no recalcula nada. Rojo si algún estado no es OK; ámbar si el detalle lleva «⚠» o el último latido tiene más de 26 horas; verde si todo va bien; gris si no se puede leer. Al pulsarlo, abre el panel de salud.
 
+## Esperas
+
+Un bloque con las dos direcciones:
+
+- **Te esperan**: lo que está en «Esperan respuesta» y «Te mencionan», agrupado por persona. El correo y Slack de una misma persona se unen por su correo electrónico; en las menciones cuenta quien preguntó. Se ven las 8 personas con más pendientes y, al pulsar una, la bandeja enseña solo lo suyo. Se añaden los casos del registro cuyo estado dice que me toca a mí, agrupados por proveedor. Si el hilo de un caso ya está en la bandeja, cuenta una vez.
+- **Esperas tú**: los hilos de mis enviados en los que el último mensaje es mío, hay algún destinatario en Para o en CC y han pasado al menos `espero_laborables` días laborables sin respuesta, más los casos en «Esperando al proveedor». Quedan fuera lo que solo va en copia oculta, los remitentes automáticos, los hilos que ya lleva un caso del registro y los de una persona que me ha escrito después por Slack. «Ya no espero» lo quita y se guarda en `resueltos`; vuelve si escribo otra vez en ese hilo.
+
+El estado de los casos se lee tal cual de la columna `estado` del registro: el panel no lo calcula ni lo cambia.
+
+## Mensaje abierto y destinatarios
+
+- **Abrir** despliega el mensaje en su propia fila, sin salir del panel. Se ve lo que ha llegado desde mi última respuesta, hasta 5 mensajes; si lo último es mío, el último recibido y mi respuesta.
+- En el correo se quitan las citas, las cabeceras de reenvío, las firmas y los pies legales; «Ver texto completo» enseña el texto tal cual. Los adjuntos salen por su nombre.
+- En Slack se ven las líneas de la conversación y las respuestas del hilo. Solo hay una llamada nueva si no se habían leído enteros.
+- Cada correo lleva una etiqueta según a quién iba: «Solo para ti», «Para ti y N más», «En copia» o «A una lista». Sale de los destinatarios del último recibido, sin llamadas nuevas.
+
+## Tareas
+
+- Una lista rápida escrita a mano, debajo de la agenda. No lee de ninguna fuente.
+- «A tareas» en cualquier elemento de la bandeja crea la tarea con el asunto y el enlace al mensaje, y lo saca de pendientes. Si después llega un mensaje nuevo en ese hilo, el elemento vuelve y la tarea lo avisa.
+- Marcarla la pasa a «Hechas», que se ven 7 días; «Quitar» la retira, con «Deshacer».
+- Cada cambio es una fila nueva en la pestaña `tareas`: manda la última de cada tarea. Se pinta al momento y, si no se guarda, se deshace con aviso.
+
 ## La IA
 
 - Clasifica al terminar cada carga, y solo lo pendiente que todavía no ha visto. Va en tandas de `ia_lote` mensajes, hasta `ia_lotes` tandas. Con `ia_lotes` a 0 queda apagada.
@@ -63,6 +88,8 @@ Lee la pestaña `Resumen` de la hoja de un panel de salud de automatizaciones (c
 - Lo que clasifica se guarda en la pestaña `clasificacion`, para no volver a pagarlo.
 - Las 12 últimas correcciones a mano van como ejemplos en cada tanda: corregir enseña.
 - Los escalados del bot de soporte no pasan por la IA: siempre piden atención.
+- Además de lo automático, aparta acuses breves sin pregunta, mensajes vacíos de aplicaciones, reenvíos «para tu información» sin petición, propuestas comerciales no solicitadas y avisos automáticos de cierre de un ticket. Lo que escribe el soporte de un proveedor sobre un caso abierto sigue pendiente.
+- **Fiabilidad**: «Cómo funciona este panel» cuenta cuántos ha apartado la IA, cuántos de esos se corrigieron después a mano y cuántos de los que dejó pendientes se apartaron a mano. Así se ve si acierta sin revisar cada caso.
 
 ## Notas
 
@@ -77,6 +104,7 @@ Lee la pestaña `Resumen` de la hoja de un panel de salud de automatizaciones (c
 - Todo el texto de terceros se pinta como texto, nunca como HTML. El markdown de las notas pasa por un renderizador propio que tampoco usa HTML.
 - Los enlaces que salen de los mensajes solo llevan a Gmail, Slack, Drive, Docs, Calendar, Google Forms y Looker Studio. Los accesos rápidos admiten cualquier `https`, porque los escribo yo en la hoja.
 - Las celdas que empiezan por `=`, `+`, `-` o `@` se escriben con un apóstrofo delante, para que la hoja no las ejecute como fórmula.
+- El mensaje abierto también se pinta como texto: los enlaces que lleva dentro no se pueden pulsar.
 - Nada se envía desde el panel, y no hay ninguna clave ni token dentro.
 
 ## Decisiones cerradas
@@ -95,3 +123,5 @@ Lee la pestaña `Resumen` de la hoja de un panel de salud de automatizaciones (c
 | Clasificar con IA todo en cada carga | Se paga cada vez: solo lo nuevo, y el resultado se guarda |
 | Meter «Para leer» dentro de Pendiente | Lo que pide respuesta y lo que pide lectura no se atienden igual. Lo leído va a Informativos, no a Resueltos |
 | Recordar en el navegador qué grupos están plegados | Igual en cualquier equipo |
+| Etiqueta «Importante» en los correos | El conector no da la prioridad que puso el remitente |
+| Calcular en el panel el estado de un caso con un proveedor | Ya lo lleva el registro de casos: el panel lo lee y no lo duplica |

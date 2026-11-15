@@ -13,5 +13,6 @@
   ],
   "prohibido": ["nombre real", "empresa-real", "empresa real"],
   "correos_permitidos": ["tu.nombre@tuempresa.com", "workspace-noreply@google.com"],
-  "ids_permitidos": ["slack_search_public_and_private"]
+  "ids_permitidos": ["slack_search_public_and_private"],
+  "slack_permitidos": ["DISCLAIMER"]
 }

@@ -1,0 +1,3 @@
+id caso,proveedor,asunto,estado,último movimiento,días sin movimiento,ids hilo
+C-001,Proveedor de ejemplo,Alta de una línea nueva,Esperando al proveedor,03/11/2026 10:15,5,
+C-002,Otro proveedor,Factura duplicada,Esperando a mi empresa,10/11/2026 16:40,2,
